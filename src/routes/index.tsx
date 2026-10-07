@@ -132,18 +132,18 @@ function Dashboard() {
     <div data-hvac={action} className="ambient-bg min-h-screen font-sans text-foreground">
       <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
         {/* Header */}
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-xl bg-hvac/15 text-hvac transition-colors duration-700"><Thermometer className="size-5" /></div>
-            <div>
-              <h1 className="text-lg font-semibold leading-tight sm:text-xl">iComfort App <span className="text-muted-foreground font-normal">| Smart Climate Control</span></h1>
+        <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:flex-wrap sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-hvac/15 text-hvac transition-colors duration-700"><Thermometer className="size-5" /></div>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold leading-tight sm:text-xl">iComfort App <span className="hidden text-muted-foreground font-normal sm:inline">| Smart Climate Control</span></h1>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {useLive && connected ? (
-              <span className="flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs text-success"><Wifi className="size-3.5" />Connected to FastAPI Bridge</span>
+              <span className="flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs text-success"><Wifi className="size-3.5" /><span className="hidden sm:inline">Connected to FastAPI Bridge</span><span className="sm:hidden">Live</span></span>
             ) : (
-              <span className="flex items-center gap-1.5 rounded-full border border-warning/30 bg-warning/10 px-3 py-1.5 text-xs text-warning"><WifiOff className="size-3.5" />{useLive ? "Bridge unreachable · " : ""}Simulated Mode</span>
+              <span className="flex items-center gap-1.5 rounded-full border border-warning/30 bg-warning/10 px-3 py-1.5 text-xs text-warning"><WifiOff className="size-3.5" /><span className="hidden sm:inline">{useLive ? "Bridge unreachable · " : ""}Simulated Mode</span><span className="sm:hidden">{useLive ? "Offline" : "Sim"}</span></span>
             )}
             <button aria-label="Settings" onClick={() => setDrawer(true)} className="glass grid size-9 place-items-center !rounded-full hover:text-hvac"><Settings className="size-4" /></button>
           </div>
@@ -162,11 +162,11 @@ function Dashboard() {
                 {badge}
               </span>
             </div>
-            <div className="mt-2 font-mono text-6xl font-semibold tracking-tight sm:text-7xl">{ambient.toFixed(1)}<span className="text-3xl text-muted-foreground">°F</span></div>
+            <div className="mt-2 font-mono text-5xl font-semibold tracking-tight sm:text-7xl">{ambient.toFixed(1)}<span className="text-2xl text-muted-foreground sm:text-3xl">°F</span></div>
 
-            <div className="my-6 flex items-center justify-center gap-4 sm:gap-8">
-              <button aria-label="Decrease" onClick={() => step(-0.5)} className="glass grid size-14 place-items-center !rounded-full hover:text-hvac active:scale-95 transition"><Minus /></button>
-              <div className="relative size-56 sm:size-64">
+            <div className="my-6 flex items-center justify-center gap-3 sm:gap-8">
+              <button aria-label="Decrease" onClick={() => step(-0.5)} className="glass grid size-12 shrink-0 place-items-center !rounded-full hover:text-hvac active:scale-95 transition sm:size-14"><Minus /></button>
+              <div className="relative size-44 sm:size-64">
                 <svg viewBox="0 0 260 260" className="size-full -rotate-[225deg]">
                   <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--accent-c)" /><stop offset="1" stopColor="var(--accent-c2)" /></linearGradient></defs>
                   <circle cx="130" cy="130" r={R} fill="none" stroke="var(--muted)" strokeWidth="14" strokeDasharray={`${arc} ${C}`} strokeLinecap="round" />
@@ -180,7 +180,7 @@ function Dashboard() {
                   </div>
                 </div>
               </div>
-              <button aria-label="Increase" onClick={() => step(0.5)} className="glass grid size-14 place-items-center !rounded-full hover:text-hvac active:scale-95 transition"><Plus /></button>
+              <button aria-label="Increase" onClick={() => step(0.5)} className="glass grid size-12 shrink-0 place-items-center !rounded-full hover:text-hvac active:scale-95 transition sm:size-14"><Plus /></button>
             </div>
 
             <div className="mb-4 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm">
@@ -236,7 +236,21 @@ function Dashboard() {
         {/* Log */}
         <section className="glass mt-4 overflow-hidden">
           <h2 className="flex items-center gap-2 border-b border-border px-4 py-3 text-sm font-medium"><Zap className="size-4 text-hvac" />Live Telemetry Log <span className="font-mono text-xs text-muted-foreground">/api/telemetry</span></h2>
-          <div className="overflow-x-auto">
+          {/* Mobile: compact card list */}
+          <div className="divide-y divide-border sm:hidden">
+            {log.length === 0 && <p className="px-4 py-6 text-center text-sm text-muted-foreground">Waiting for telemetry…</p>}
+            {log.map((r) => (
+              <div key={r.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm animate-in fade-in slide-in-from-top-1">
+                <div className="min-w-0">
+                  <div className="font-mono">{r.temp.toFixed(2)}°F <span className="text-muted-foreground">→ {r.target.toFixed(1)}°F</span></div>
+                  <div className="truncate text-xs text-muted-foreground">{r.time} · {r.origin}</div>
+                </div>
+                <span data-hvac={r.action} className="shrink-0 rounded-md bg-hvac/15 px-2 py-0.5 text-xs text-hvac">{r.action}</span>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: full table */}
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full min-w-[560px] text-sm">
               <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>{["Time", "Recorded", "Setpoint", "Action", "Node Origin"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}</tr>
