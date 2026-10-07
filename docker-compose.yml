@@ -1,0 +1,25 @@
+# One-command orchestration for API & Simulator
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      ICOMFORT_DATABASE_URL: sqlite:///./comfort_data.db
+    volumes:
+      - comfort-data:/app
+
+  simulator:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["python", "simulator.py", "--api", "http://api:8000"]
+    depends_on:
+      - api
+    volumes:
+      - ./simulator.py:/app/simulator.py
+
+volumes:
+  comfort-data:
