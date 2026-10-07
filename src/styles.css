@@ -142,3 +142,54 @@
     color: var(--color-foreground);
   }
 }
+
+:root {
+  --background: oklch(0.16 0.02 260);
+  --foreground: oklch(0.96 0.01 250);
+  --card: oklch(0.22 0.02 260 / 0.55);
+  --card-foreground: oklch(0.96 0.01 250);
+  --muted: oklch(0.26 0.02 260);
+  --muted-foreground: oklch(0.68 0.02 255);
+  --border: oklch(1 0 0 / 0.09);
+  --success: oklch(0.75 0.17 150);
+  --warning: oklch(0.8 0.15 80);
+  --heat: oklch(0.68 0.21 38);
+  --heat-2: oklch(0.63 0.22 27);
+  --cool: oklch(0.75 0.13 210);
+  --cool-2: oklch(0.65 0.17 250);
+  --idle: oklch(0.55 0.03 257);
+  --idle-2: oklch(0.45 0.03 257);
+  --accent-c: var(--idle);
+  --accent-c2: var(--idle-2);
+  --glow: transparent;
+}
+[data-hvac="HEATING"] { --accent-c: var(--heat); --accent-c2: var(--heat-2); --glow: oklch(0.68 0.21 38 / 0.28); }
+[data-hvac="COOLING"] { --accent-c: var(--cool); --accent-c2: var(--cool-2); --glow: oklch(0.75 0.13 210 / 0.25); }
+[data-hvac] { transition: --accent-c 0.6s; }
+
+@theme inline {
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-hvac: var(--accent-c);
+  --color-hvac-2: var(--accent-c2);
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@utility glass {
+  background: var(--card);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+}
+@utility glass-glow {
+  box-shadow: 0 0 60px -10px var(--glow), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  border-color: color-mix(in oklab, var(--accent-c) 30%, var(--border));
+}
+@utility ambient-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow), transparent 70%),
+    var(--background);
+  transition: background 0.8s ease;
+}
